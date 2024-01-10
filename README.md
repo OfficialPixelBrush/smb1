@@ -24,6 +24,10 @@ I do plan on eventually taking this transpilation and forking a PC version out o
 ### Moddability
 While I'd love to provide some kind of easy to use modding API, I simply don't know how I'd do this. Additionally, that just seems like a lot of extra work I don't have the time for. If anyone wants to make a moddable Fork to add mmo-style online multiplayer or whatever, go right ahead. Just please credit me.
 
+### What about the C++ Port by MitchellSternke?
+[SuperMarioBros-C](https://github.com/MitchellSternke/SuperMarioBros-C/tree/master)
+While this is a great 1:1 port of the game, it was made via automated methods, and mostly ends up reimplementating CPU Registers and similar. The goal of this transpilation is to reimagine the Code to be more in like with typical C Code, having the game run fully natively on the users hardware. 
+
 # Building (ideally)
 1. Put your Super Mario Bros USA ROM into the root of the Directory.
 2. Run `extract_assets.py`
