@@ -35,3 +35,10 @@ While this is a great 1:1 port of the game, it was made via automated methods, a
 3. Run `make`
 4. The game can run without the ROM, so feel free to delete it
 5. Have fun!
+
+# Inspirations
+- Zelda3 Decomp & PC Port
+- Zelda OoT Decomp
+
+# License
+tba
