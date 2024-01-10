@@ -1,0 +1,1 @@
+gcc ./smb.c -osmb
