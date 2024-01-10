@@ -9,7 +9,7 @@
 The main goal is to have a functionally equivalent, portable Version of the original Super Mario Bros. for Microsoft Windows and Linux Computers.
 
 ### Accuracy
-If possibly, I'd like to preserve as many glitches as possible, though some might disappear to make way for Quality of Life changes, such as an uncapped sprite limit or similar. I definitely want glitches like the Minus World or Wall-jumping to remain!
+If possible, I'd like to preserve as many glitches as possible, though some might disappear to make way for Quality of Life changes, such as an uncapped sprite limit or similar. I definitely want glitches like the Minus World or Wall-jumping to remain!
 
 ### Flexibility
 While I want this to be a fairly accurate port, I want to liberate Super Mario Bros. of some of it's limitations, such as it's sprite, object or resolution limits.
@@ -26,7 +26,8 @@ While I'd love to provide some kind of easy to use modding API, I simply don't k
 
 ### What about the C++ Port by MitchellSternke?
 [SuperMarioBros-C](https://github.com/MitchellSternke/SuperMarioBros-C/tree/master)
-While this is a great 1:1 port of the game, it was made via automated methods, and mostly ends up reimplementating CPU Registers and similar. The goal of this transpilation is to reimagine the Code to be more in like with typical C Code, having the game run fully natively on the users hardware. 
+
+While this is a great 1:1 port of the game, it was made via automated methods, and mostly ends up reimplementating CPU Registers and similar. The goal of this transpilation is to reimagine the Code as a fully native C Program, and having the game run natively on the end-users hardware. 
 
 # Building (ideally)
 1. Put your Super Mario Bros USA ROM into the root of the Directory.
