@@ -16,10 +16,12 @@ While I want this to be a fairly accurate port, I want to liberate Super Mario B
 Since the original Super Mario Bros. was written by hand in 6502 Assembler, there is little point in trying to have a Compiler like CC65 create a perfectly accurate Binary. The main goal is to have it work similar enough to the original game.
 
 ### Ports
-I do plan having this transpilation run natively on PCs, so this is technically a Port as well, though it'll largely be targeting PCs alone. Other hardware will not be considered directly, but I'll still make an effort to keep the Code largely portable.
+I do plan on having this transpilation run natively on PCs, so this is technically a Port as well, though it'll largely be targeting PCs alone. Other hardware will not be considered directly, but I'll still make an effort to keep the Code largely portable.
 
 ### Moddability
 While I'd love to provide some kind of easy to use modding API, I simply don't know how I'd do this. Additionally, that just seems like a lot of extra work I don't have the time for. If anyone wants to make a moddable Fork to add mmo-style online multiplayer or whatever, go right ahead. Just please credit me.
+
+However, I will make an effort to make the code malleable, as I'd like to make a few optional adjustments, like custom resolutions and aspect ratios. 
 
 # Acknowledgements
 ### What about the C++ Port by MitchellSternke?
