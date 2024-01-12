@@ -9,7 +9,7 @@ The main goal is to have a functionally equivalent, portable Version of the orig
 If possible, I'd like to preserve as many glitches as possible, though some might disappear to make way for Quality of Life changes, such as an uncapped sprite limit or similar. I definitely want glitches like the Minus World or Wall-jumping to remain!
 
 ### Flexibility
-While I want this to be a fairly accurate port, I want to liberate Super Mario Bros. of some of it's limitations, such as it's sprite, object or resolution limits.
+While I want this to be a fairly accurate port, I want to liberate Super Mario Bros. of some of it's limitations, such as it's sprite, object or resolution limits. Due to this, glitches that rely on Memory-manipulation or similar will not work.
 
 # Non-Goals
 ### Getting a matching binary
