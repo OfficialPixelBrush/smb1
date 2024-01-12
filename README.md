@@ -1,8 +1,5 @@
-# SMB1PC
- This is a transpilation of Super Mario Bros. into C, aiming to port it natively to the PC.
-
-# Progress
- Progress: 0.0%
+# SMB1C
+ This is a transpilation of Super Mario Bros. into C, partially aiming to port it natively to the PC.
 
 # Goals
 ### Main Goal
@@ -19,26 +16,33 @@ While I want this to be a fairly accurate port, I want to liberate Super Mario B
 Since the original Super Mario Bros. was written by hand in 6502 Assembler, there is little point in trying to have a Compiler like CC65 create a perfectly accurate Binary. The main goal is to have it work similar enough to the original game.
 
 ### Ports
-I do plan on eventually taking this transpilation and forking a PC version out of it, with features like native widescreen, but that'll have to wait until the game is actually fully transpiled. For this I'll mostly be focusing my efforts on Windows and Linux PCs, alongside the Steam Deck, but I do not plan to make ports for systems like the Switch. That can be someone elses job!
+I do plan having this transpilation run natively on PCs, so this is technically a Port as well, though it'll largely be targeting PCs alone. Other hardware will not be considered directly, but I'll still make an effort to keep the Code largely portable.
 
 ### Moddability
 While I'd love to provide some kind of easy to use modding API, I simply don't know how I'd do this. Additionally, that just seems like a lot of extra work I don't have the time for. If anyone wants to make a moddable Fork to add mmo-style online multiplayer or whatever, go right ahead. Just please credit me.
 
+# Acknowledgements
 ### What about the C++ Port by MitchellSternke?
 [SuperMarioBros-C](https://github.com/MitchellSternke/SuperMarioBros-C/tree/master)
 
 While this is a great 1:1 port of the game, it was made via automated methods, and mostly ends up reimplementating CPU Registers and similar. The goal of this transpilation is to reimagine the Code as a fully native C Program, and having the game run natively on the end-users hardware. 
 
-# Building (ideally)
-1. Put your Super Mario Bros USA ROM into the root of the Directory.
-2. Run `extract_assets.py`
-3. Run `make`
-4. The game can run without the ROM, so feel free to delete it
-5. Have fun!
+### What about the C++ by Łykasz Jakowski?
+[uMario_Jakowski](https://github.com/jakowskidev/uMario_Jakowski)
+
+This is a Remake of the game, not using it's original source-code as a guideline.
+
+# Building
+As this is largely incomplete code, building for the sake of playing is quite pointless.
+However, for those that want to contribute, any C99 compatible Compiler should suffice (at least until I've decided what graphics library I want to use for rendering the graphics).
+
+Either way, in all likelyhood, you'll need an original Super Mario Bros. ROM. From this ROM I'll later provide scripts to extract the Character ROM, used by the games' graphics. These'll then be loaded into the game.
 
 # Inspirations
-- Zelda3 Decomp & PC Port
-- Zelda OoT Decomp
+- [zelda3 by snesrev](https://github.com/snesrev/zelda3)
+- [The Legend of Zelda: Ocarina of Time Decompilation](https://github.com/zeldaret/oot)
+- [Ship of Harkinian](https://www.shipofharkinian.com/)
+- [Super Mario 64 Decompilation](https://github.com/n64decomp/sm64)
 
 # License
-tba
+[GNU GENERAL PUBLIC LICENSE v2](LICENSE)
