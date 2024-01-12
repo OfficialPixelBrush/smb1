@@ -1,0 +1,3 @@
+[submodule "smbdis"]
+	path = smbdis
+	url = https://gist.github.com/1wErt3r/4048722
