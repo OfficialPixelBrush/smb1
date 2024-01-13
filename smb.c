@@ -21,34 +21,34 @@
 // Some of the defines in the original decomp refer to addresses,
 // which'll be replaced with functions as progress on this game continues.
 
-/*
-;-------------------------------------------------------------------------------------
-;DEFINES
+//-------------------------------------------------------------------------------------
+// DEFINES
 
-;NES specific hardware defines
+// NES specific hardware defines
+// TODO: These'll need to be semi-emulated?
+// These'll at least be used to get info from the rendering engine
 
-PPU_CTRL_REG1         = 0x2000
-PPU_CTRL_REG2         = 0x2001
-PPU_STATUS            = 0x2002
-PPU_SPR_ADDR          = 0x2003
-PPU_SPR_DATA          = 0x2004
-PPU_SCROLL_REG        = 0x2005
-PPU_ADDRESS           = 0x2006
-PPU_DATA              = 0x2007
-
-SND_REGISTER          = 0x4000
-SND_SQUARE1_REG       = 0x4000
-SND_SQUARE2_REG       = 0x4004
-SND_TRIANGLE_REG      = 0x4008
-SND_NOISE_REG         = 0x400c
-SND_DELTA_REG         = 0x4010
-SND_MASTERCTRL_REG    = 0x4015
-
-SPR_DMA               = 0x4014
-JOYPAD_PORT           = 0x4016
-JOYPAD_PORT1          = 0x4016
-JOYPAD_PORT2          = 0x4017
-*/
+byte PPU_CTRL_REG1         ;// 0x2000
+byte PPU_CTRL_REG2         ;// 0x2001
+byte PPU_STATUS            ;// 0x2002
+byte PPU_SPR_ADDR          ;// 0x2003
+byte PPU_SPR_DATA          ;// 0x2004
+byte PPU_SCROLL_REG        ;// 0x2005
+byte PPU_ADDRESS           ;// 0x2006
+byte PPU_DATA              ;// 0x2007
+ 
+byte SND_REGISTER          ;// 0x4000
+byte SND_SQUARE1_REG       ;// 0x4000
+byte SND_SQUARE2_REG       ;// 0x4004
+byte SND_TRIANGLE_REG      ;// 0x4008
+byte SND_NOISE_REG         ;// 0x400c
+byte SND_DELTA_REG         ;// 0x4010
+byte SND_MASTERCTRL_REG    ;// 0x4015
+ 
+byte SPR_DMA               ;// 0x4014
+byte JOYPAD_PORT           ;// 0x4016
+byte JOYPAD_PORT1          ;// 0x4016
+byte JOYPAD_PORT2          ;// 0x4017
 
 // GAME SPECIFIC DEFINES
 
@@ -636,7 +636,7 @@ byte AltRegContentFlag     ; // 0x07ca
 #define RetainerObject 0x35
 #define TallEnemy 0x09
 
-// Level Number Constants
+// Other constants
 #define World1 0
 #define World2 1
 #define World3 2
@@ -650,6 +650,16 @@ byte AltRegContentFlag     ; // 0x07ca
 #define Level2 1
 #define Level3 2
 #define Level4 3
+
+/*
+#define WarmBootOffset        = <$07d6
+#define ColdBootOffset        = <$07fe
+#define TitleScreenDataOffset = $1ec0
+#define SoundMemory           = $07b0
+#define SwimTileRepOffset     = PlayerGraphicsTable + $9e
+#define MusicHeaderOffsetData = MusicHeaderData - 1
+#define MHD                   = MusicHeaderData
+*/
 
 // Controller bits
 #define A_Button 0b10000000
@@ -665,6 +675,9 @@ byte AltRegContentFlag     ; // 0x07ca
 #define GameModeValue 1
 #define VictoryModeValue 2
 #define GameOverModeValue 3
+
+
+
 
 int main() {
     printf("Hello, World!\n");
