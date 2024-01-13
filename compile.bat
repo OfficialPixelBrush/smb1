@@ -1,1 +1,1 @@
-gcc ./smb.c -osmb
+gcc -std=c99 ./smb.c -osmb

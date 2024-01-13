@@ -4,6 +4,16 @@
 
 // Libaries
 #include <stdio.h>
+#include <stdint.h>
+
+// Type definitions
+#if __STDC_VERSION__ >= 199901L
+    // If we're using C99+, we can just use uint8
+    typedef uint8_t byte;
+#else
+    // Otherwise we need to use unsigned chars
+    typedef unsigned char byte;
+#endif
 
 //-------------------------------------------------------------------------------------
 // DEFINES
@@ -17,533 +27,537 @@
 
 ;NES specific hardware defines
 
-PPU_CTRL_REG1         = $2000
-PPU_CTRL_REG2         = $2001
-PPU_STATUS            = $2002
-PPU_SPR_ADDR          = $2003
-PPU_SPR_DATA          = $2004
-PPU_SCROLL_REG        = $2005
-PPU_ADDRESS           = $2006
-PPU_DATA              = $2007
-
-SND_REGISTER          = $4000
-SND_SQUARE1_REG       = $4000
-SND_SQUARE2_REG       = $4004
-SND_TRIANGLE_REG      = $4008
-SND_NOISE_REG         = $400c
-SND_DELTA_REG         = $4010
-SND_MASTERCTRL_REG    = $4015
-
-SPR_DMA               = $4014
-JOYPAD_PORT           = $4016
-JOYPAD_PORT1          = $4016
-JOYPAD_PORT2          = $4017
-
-; GAME SPECIFIC DEFINES
-
-ObjectOffset          = $08
-
-FrameCounter          = $09
-
-SavedJoypadBits       = $06fc
-SavedJoypad1Bits      = $06fc
-SavedJoypad2Bits      = $06fd
-JoypadBitMask         = $074a
-JoypadOverride        = $0758
-
-A_B_Buttons           = $0a
-PreviousA_B_Buttons   = $0d
-Up_Down_Buttons       = $0b
-Left_Right_Buttons    = $0c
-
-GameEngineSubroutine  = $0e
-
-Mirror_PPU_CTRL_REG1  = $0778
-Mirror_PPU_CTRL_REG2  = $0779
-
-OperMode              = $0770
-OperMode_Task         = $0772
-ScreenRoutineTask     = $073c
-
-GamePauseStatus       = $0776
-GamePauseTimer        = $0777
-
-DemoAction            = $0717
-DemoActionTimer       = $0718
-
-TimerControl          = $0747
-IntervalTimerControl  = $077f
-
-Timers                = $0780
-SelectTimer           = $0780
-PlayerAnimTimer       = $0781
-JumpSwimTimer         = $0782
-RunningTimer          = $0783
-BlockBounceTimer      = $0784
-SideCollisionTimer    = $0785
-JumpspringTimer       = $0786
-GameTimerCtrlTimer    = $0787
-ClimbSideTimer        = $0789
-EnemyFrameTimer       = $078a
-FrenzyEnemyTimer      = $078f
-BowserFireBreathTimer = $0790
-StompTimer            = $0791
-AirBubbleTimer        = $0792
-ScrollIntervalTimer   = $0795
-EnemyIntervalTimer    = $0796
-BrickCoinTimer        = $079d
-InjuryTimer           = $079e
-StarInvincibleTimer   = $079f
-ScreenTimer           = $07a0
-WorldEndTimer         = $07a1
-DemoTimer             = $07a2
-
-Sprite_Data           = $0200
-
-Sprite_Y_Position     = $0200
-Sprite_Tilenumber     = $0201
-Sprite_Attributes     = $0202
-Sprite_X_Position     = $0203
-
-ScreenEdge_PageLoc    = $071a
-ScreenEdge_X_Pos      = $071c
-ScreenLeft_PageLoc    = $071a
-ScreenRight_PageLoc   = $071b
-ScreenLeft_X_Pos      = $071c
-ScreenRight_X_Pos     = $071d
-
-PlayerFacingDir       = $33
-DestinationPageLoc    = $34
-VictoryWalkControl    = $35
-ScrollFractional      = $0768
-PrimaryMsgCounter     = $0719
-SecondaryMsgCounter   = $0749
-
-HorizontalScroll      = $073f
-VerticalScroll        = $0740
-ScrollLock            = $0723
-ScrollThirtyTwo       = $073d
-Player_X_Scroll       = $06ff
-Player_Pos_ForScroll  = $0755
-ScrollAmount          = $0775
-
-AreaData              = $e7
-AreaDataLow           = $e7
-AreaDataHigh          = $e8
-EnemyData             = $e9
-EnemyDataLow          = $e9
-EnemyDataHigh         = $ea
-
-AreaParserTaskNum     = $071f
-ColumnSets            = $071e
-CurrentPageLoc        = $0725
-CurrentColumnPos      = $0726
-BackloadingFlag       = $0728
-BehindAreaParserFlag  = $0729
-AreaObjectPageLoc     = $072a
-AreaObjectPageSel     = $072b
-AreaDataOffset        = $072c
-AreaObjOffsetBuffer   = $072d
-AreaObjectLength      = $0730
-StaircaseControl      = $0734
-AreaObjectHeight      = $0735
-MushroomLedgeHalfLen  = $0736
-EnemyDataOffset       = $0739
-EnemyObjectPageLoc    = $073a
-EnemyObjectPageSel    = $073b
-MetatileBuffer        = $06a1
-BlockBufferColumnPos  = $06a0
-CurrentNTAddr_Low     = $0721
-CurrentNTAddr_High    = $0720
-AttributeBuffer       = $03f9
-
-LoopCommand           = $0745
-
-DisplayDigits         = $07d7
-TopScoreDisplay       = $07d7
-ScoreAndCoinDisplay   = $07dd
-PlayerScoreDisplay    = $07dd
-GameTimerDisplay      = $07f8
-DigitModifier         = $0134
-
-VerticalFlipFlag      = $0109
-FloateyNum_Control    = $0110
-ShellChainCounter     = $0125
-FloateyNum_Timer      = $012c
-FloateyNum_X_Pos      = $0117
-FloateyNum_Y_Pos      = $011e
-FlagpoleFNum_Y_Pos    = $010d
-FlagpoleFNum_YMFDummy = $010e
-FlagpoleScore         = $010f
-FlagpoleCollisionYPos = $070f
-StompChainCounter     = $0484
-
-VRAM_Buffer1_Offset   = $0300
-VRAM_Buffer1          = $0301
-VRAM_Buffer2_Offset   = $0340
-VRAM_Buffer2          = $0341
-VRAM_Buffer_AddrCtrl  = $0773
-Sprite0HitDetectFlag  = $0722
-DisableScreenFlag     = $0774
-DisableIntermediate   = $0769
-ColorRotateOffset     = $06d4
-
-TerrainControl        = $0727
-AreaStyle             = $0733
-ForegroundScenery     = $0741
-BackgroundScenery     = $0742
-CloudTypeOverride     = $0743
-BackgroundColorCtrl   = $0744
-AreaType              = $074e
-AreaAddrsLOffset      = $074f
-AreaPointer           = $0750
-
-PlayerEntranceCtrl    = $0710
-GameTimerSetting      = $0715
-AltEntranceControl    = $0752
-EntrancePage          = $0751
-NumberOfPlayers       = $077a
-WarpZoneControl       = $06d6
-ChangeAreaTimer       = $06de
-
-MultiLoopCorrectCntr  = $06d9
-MultiLoopPassCntr     = $06da
-
-FetchNewGameTimerFlag = $0757
-GameTimerExpiredFlag  = $0759
-
-PrimaryHardMode       = $076a
-SecondaryHardMode     = $06cc
-WorldSelectNumber     = $076b
-WorldSelectEnableFlag = $07fc
-ContinueWorld         = $07fd
-
-CurrentPlayer         = $0753
-PlayerSize            = $0754
-PlayerStatus          = $0756
-
-OnscreenPlayerInfo    = $075a
-NumberofLives         = $075a ;used by current player
-HalfwayPage           = $075b
-LevelNumber           = $075c ;the actual dash number
-Hidden1UpFlag         = $075d
-CoinTally             = $075e
-WorldNumber           = $075f
-AreaNumber            = $0760 ;internal number used to find areas
-
-CoinTallyFor1Ups      = $0748
-
-OffscreenPlayerInfo   = $0761
-OffScr_NumberofLives  = $0761 ;used by offscreen player
-OffScr_HalfwayPage    = $0762
-OffScr_LevelNumber    = $0763
-OffScr_Hidden1UpFlag  = $0764
-OffScr_CoinTally      = $0765
-OffScr_WorldNumber    = $0766
-OffScr_AreaNumber     = $0767
-
-BalPlatformAlignment  = $03a0
-Platform_X_Scroll     = $03a1
-PlatformCollisionFlag = $03a2
-YPlatformTopYPos      = $0401
-YPlatformCenterYPos   = $58
-
-BrickCoinTimerFlag    = $06bc
-StarFlagTaskControl   = $0746
-
-PseudoRandomBitReg    = $07a7
-WarmBootValidation    = $07ff
-
-SprShuffleAmtOffset   = $06e0
-SprShuffleAmt         = $06e1
-SprDataOffset         = $06e4
-Player_SprDataOffset  = $06e4
-Enemy_SprDataOffset   = $06e5
-Block_SprDataOffset   = $06ec
-Alt_SprDataOffset     = $06ec
-Bubble_SprDataOffset  = $06ee
-FBall_SprDataOffset   = $06f1
-Misc_SprDataOffset    = $06f3
-SprDataOffset_Ctrl    = $03ee
-
-Player_State          = $1d
-Enemy_State           = $1e
-Fireball_State        = $24
-Block_State           = $26
-Misc_State            = $2a
-
-Player_MovingDir      = $45
-Enemy_MovingDir       = $46
-
-SprObject_X_Speed     = $57
-Player_X_Speed        = $57
-Enemy_X_Speed         = $58
-Fireball_X_Speed      = $5e
-Block_X_Speed         = $60
-Misc_X_Speed          = $64
-
-Jumpspring_FixedYPos  = $58
-JumpspringAnimCtrl    = $070e
-JumpspringForce       = $06db
-
-SprObject_PageLoc     = $6d
-Player_PageLoc        = $6d
-Enemy_PageLoc         = $6e
-Fireball_PageLoc      = $74
-Block_PageLoc         = $76
-Misc_PageLoc          = $7a
-Bubble_PageLoc        = $83
-
-SprObject_X_Position  = $86
-Player_X_Position     = $86
-Enemy_X_Position      = $87
-Fireball_X_Position   = $8d
-Block_X_Position      = $8f
-Misc_X_Position       = $93
-Bubble_X_Position     = $9c
-
-SprObject_Y_Speed     = $9f
-Player_Y_Speed        = $9f
-Enemy_Y_Speed         = $a0
-Fireball_Y_Speed      = $a6
-Block_Y_Speed         = $a8
-Misc_Y_Speed          = $ac
-
-SprObject_Y_HighPos   = $b5
-Player_Y_HighPos      = $b5
-Enemy_Y_HighPos       = $b6
-Fireball_Y_HighPos    = $bc
-Block_Y_HighPos       = $be
-Misc_Y_HighPos        = $c2
-Bubble_Y_HighPos      = $cb
-
-SprObject_Y_Position  = $ce
-Player_Y_Position     = $ce
-Enemy_Y_Position      = $cf
-Fireball_Y_Position   = $d5
-Block_Y_Position      = $d7
-Misc_Y_Position       = $db
-Bubble_Y_Position     = $e4
-
-SprObject_Rel_XPos    = $03ad
-Player_Rel_XPos       = $03ad
-Enemy_Rel_XPos        = $03ae
-Fireball_Rel_XPos     = $03af
-Bubble_Rel_XPos       = $03b0
-Block_Rel_XPos        = $03b1
-Misc_Rel_XPos         = $03b3
-
-SprObject_Rel_YPos    = $03b8
-Player_Rel_YPos       = $03b8
-Enemy_Rel_YPos        = $03b9
-Fireball_Rel_YPos     = $03ba
-Bubble_Rel_YPos       = $03bb
-Block_Rel_YPos        = $03bc
-Misc_Rel_YPos         = $03be
-
-SprObject_SprAttrib   = $03c4
-Player_SprAttrib      = $03c4
-Enemy_SprAttrib       = $03c5
-
-SprObject_X_MoveForce = $0400
-Enemy_X_MoveForce     = $0401
-
-SprObject_YMF_Dummy   = $0416
-Player_YMF_Dummy      = $0416
-Enemy_YMF_Dummy       = $0417
-Bubble_YMF_Dummy      = $042c
-
-SprObject_Y_MoveForce = $0433
-Player_Y_MoveForce    = $0433
-Enemy_Y_MoveForce     = $0434
-Block_Y_MoveForce     = $043c
-
-DisableCollisionDet   = $0716
-Player_CollisionBits  = $0490
-Enemy_CollisionBits   = $0491
-
-SprObj_BoundBoxCtrl   = $0499
-Player_BoundBoxCtrl   = $0499
-Enemy_BoundBoxCtrl    = $049a
-Fireball_BoundBoxCtrl = $04a0
-Misc_BoundBoxCtrl     = $04a2
-
-EnemyFrenzyBuffer     = $06cb
-EnemyFrenzyQueue      = $06cd
-Enemy_Flag            = $0f
-Enemy_ID              = $16
-
-PlayerGfxOffset       = $06d5
-Player_XSpeedAbsolute = $0700
-FrictionAdderHigh     = $0701
-FrictionAdderLow      = $0702
-RunningSpeed          = $0703
-SwimmingFlag          = $0704
-Player_X_MoveForce    = $0705
-DiffToHaltJump        = $0706
-JumpOrigin_Y_HighPos  = $0707
-JumpOrigin_Y_Position = $0708
-VerticalForce         = $0709
-VerticalForceDown     = $070a
-PlayerChangeSizeFlag  = $070b
-PlayerAnimTimerSet    = $070c
-PlayerAnimCtrl        = $070d
-DeathMusicLoaded      = $0712
-FlagpoleSoundQueue    = $0713
-CrouchingFlag         = $0714
-MaximumLeftSpeed      = $0450
-MaximumRightSpeed     = $0456
-
-SprObject_OffscrBits  = $03d0
-Player_OffscreenBits  = $03d0
-Enemy_OffscreenBits   = $03d1
-FBall_OffscreenBits   = $03d2
-Bubble_OffscreenBits  = $03d3
-Block_OffscreenBits   = $03d4
-Misc_OffscreenBits    = $03d6
-EnemyOffscrBitsMasked = $03d8
-
-Cannon_Offset         = $046a
-Cannon_PageLoc        = $046b
-Cannon_X_Position     = $0471
-Cannon_Y_Position     = $0477
-Cannon_Timer          = $047d
-
-Whirlpool_Offset      = $046a
-Whirlpool_PageLoc     = $046b
-Whirlpool_LeftExtent  = $0471
-Whirlpool_Length      = $0477
-Whirlpool_Flag        = $047d
-
-VineFlagOffset        = $0398
-VineHeight            = $0399
-VineObjOffset         = $039a
-VineStart_Y_Position  = $039d
-
-Block_Orig_YPos       = $03e4
-Block_BBuf_Low        = $03e6
-Block_Metatile        = $03e8
-Block_PageLoc2        = $03ea
-Block_RepFlag         = $03ec
-Block_ResidualCounter = $03f0
-Block_Orig_XPos       = $03f1
-
-BoundingBox_UL_XPos   = $04ac
-BoundingBox_UL_YPos   = $04ad
-BoundingBox_DR_XPos   = $04ae
-BoundingBox_DR_YPos   = $04af
-BoundingBox_UL_Corner = $04ac
-BoundingBox_LR_Corner = $04ae
-EnemyBoundingBoxCoord = $04b0
-
-PowerUpType           = $39
-
-FireballBouncingFlag  = $3a
-FireballCounter       = $06ce
-FireballThrowingTimer = $0711
-
-HammerEnemyOffset     = $06ae
-JumpCoinMiscOffset    = $06b7
-
-Block_Buffer_1        = $0500
-Block_Buffer_2        = $05d0
-
-HammerThrowingTimer   = $03a2
-HammerBroJumpTimer    = $3c
-Misc_Collision_Flag   = $06be
-
-RedPTroopaOrigXPos    = $0401
-RedPTroopaCenterYPos  = $58
-
-XMovePrimaryCounter   = $a0
-XMoveSecondaryCounter = $58
-
-CheepCheepMoveMFlag   = $58
-CheepCheepOrigYPos    = $0434
-BitMFilter            = $06dd
-
-LakituReappearTimer   = $06d1
-LakituMoveSpeed       = $58
-LakituMoveDirection   = $a0
-
-FirebarSpinState_Low  = $58
-FirebarSpinState_High = $a0
-FirebarSpinSpeed      = $0388
-FirebarSpinDirection  = $34
-
-DuplicateObj_Offset   = $06cf
-NumberofGroupEnemies  = $06d3
-
-BlooperMoveCounter    = $a0
-BlooperMoveSpeed      = $58
-
-BowserBodyControls    = $0363
-BowserFeetCounter     = $0364
-BowserMovementSpeed   = $0365
-BowserOrigXPos        = $0366
-BowserFlameTimerCtrl  = $0367
-BowserFront_Offset    = $0368
-BridgeCollapseOffset  = $0369
-BowserGfxFlag         = $036a
-BowserHitPoints       = $0483
-MaxRangeFromOrigin    = $06dc
-
-BowserFlamePRandomOfs = $0417
-
-PiranhaPlantUpYPos    = $0417
-PiranhaPlantDownYPos  = $0434
-PiranhaPlant_Y_Speed  = $58
-PiranhaPlant_MoveFlag = $a0
-
-FireworksCounter      = $06d7
-ExplosionGfxCounter   = $58
-ExplosionTimerCounter = $a0
-
-;sound related defines
-Squ2_NoteLenBuffer    = $07b3
-Squ2_NoteLenCounter   = $07b4
-Squ2_EnvelopeDataCtrl = $07b5
-Squ1_NoteLenCounter   = $07b6
-Squ1_EnvelopeDataCtrl = $07b7
-Tri_NoteLenBuffer     = $07b8
-Tri_NoteLenCounter    = $07b9
-Noise_BeatLenCounter  = $07ba
-Squ1_SfxLenCounter    = $07bb
-Squ2_SfxLenCounter    = $07bd
-Sfx_SecondaryCounter  = $07be
-Noise_SfxLenCounter   = $07bf
-
-PauseSoundQueue       = $fa
-Square1SoundQueue     = $ff
-Square2SoundQueue     = $fe
-NoiseSoundQueue       = $fd
-AreaMusicQueue        = $fb
-EventMusicQueue       = $fc
-
-Square1SoundBuffer    = $f1
-Square2SoundBuffer    = $f2
-NoiseSoundBuffer      = $f3
-AreaMusicBuffer       = $f4
-EventMusicBuffer      = $07b1
-PauseSoundBuffer      = $07b2
-
-MusicData             = $f5
-MusicDataLow          = $f5
-MusicDataHigh         = $f6
-MusicOffset_Square2   = $f7
-MusicOffset_Square1   = $f8
-MusicOffset_Triangle  = $f9
-MusicOffset_Noise     = $07b0
-
-NoteLenLookupTblOfs   = $f0
-DAC_Counter           = $07c0
-NoiseDataLoopbackOfs  = $07c1
-NoteLengthTblAdder    = $07c4
-AreaMusicBuffer_Alt   = $07c5
-PauseModeFlag         = $07c6
-GroundMusicHeaderOfs  = $07c7
-AltRegContentFlag     = $07ca
+PPU_CTRL_REG1         = 0x2000
+PPU_CTRL_REG2         = 0x2001
+PPU_STATUS            = 0x2002
+PPU_SPR_ADDR          = 0x2003
+PPU_SPR_DATA          = 0x2004
+PPU_SCROLL_REG        = 0x2005
+PPU_ADDRESS           = 0x2006
+PPU_DATA              = 0x2007
+
+SND_REGISTER          = 0x4000
+SND_SQUARE1_REG       = 0x4000
+SND_SQUARE2_REG       = 0x4004
+SND_TRIANGLE_REG      = 0x4008
+SND_NOISE_REG         = 0x400c
+SND_DELTA_REG         = 0x4010
+SND_MASTERCTRL_REG    = 0x4015
+
+SPR_DMA               = 0x4014
+JOYPAD_PORT           = 0x4016
+JOYPAD_PORT1          = 0x4016
+JOYPAD_PORT2          = 0x4017
 */
+
+// GAME SPECIFIC DEFINES
+
+byte ObjectOffset = 0x08;
+
+byte FrameCounter = 0x09;
+
+/*
+byte SavedJoypadBits= 0x06fc
+SavedJoypad1Bits      = 0x06fc
+SavedJoypad2Bits      = 0x06fd
+JoypadBitMask         = 0x074a
+JoypadOverride        = 0x0758
+
+A_B_Buttons           = 0x0a
+PreviousA_B_Buttons   = 0x0d
+Up_Down_Buttons       = 0x0b
+Left_Right_Buttons    = 0x0c
+
+GameEngineSubroutine  = 0x0e
+
+Mirror_PPU_CTRL_REG1  = 0x0778
+Mirror_PPU_CTRL_REG2  = 0x0779
+
+OperMode              = 0x0770
+OperMode_Task         = 0x0772
+ScreenRoutineTask     = 0x073c
+*/
+
+byte GamePauseStatus       ; // 0x0776
+byte GamePauseTimer        ; // 0x0777
+
+byte DemoAction            ; // 0x0717
+byte DemoActionTimer       ; // 0x0718
+
+byte TimerControl          ; // 0x0747
+byte IntervalTimerControl  ; // 0x077f
+
+byte Timers                ; // 0x0780
+byte SelectTimer           ; // 0x0780
+byte PlayerAnimTimer       ; // 0x0781
+byte JumpSwimTimer         ; // 0x0782
+byte RunningTimer          ; // 0x0783
+byte BlockBounceTimer      ; // 0x0784
+byte SideCollisionTimer    ; // 0x0785
+byte JumpspringTimer       ; // 0x0786
+byte GameTimerCtrlTimer    ; // 0x0787
+byte ClimbSideTimer        ; // 0x0789
+byte EnemyFrameTimer       ; // 0x078a
+byte FrenzyEnemyTimer      ; // 0x078f
+byte BowserFireBreathTimer ; // 0x0790
+byte StompTimer            ; // 0x0791
+byte AirBubbleTimer        ; // 0x0792
+byte ScrollIntervalTimer   ; // 0x0795
+byte EnemyIntervalTimer    ; // 0x0796
+byte BrickCoinTimer        ; // 0x079d
+byte InjuryTimer           ; // 0x079e
+byte StarInvincibleTimer   ; // 0x079f
+byte ScreenTimer           ; // 0x07a0
+byte WorldEndTimer         ; // 0x07a1
+byte DemoTimer             ; // 0x07a2
+
+// This is prolly a pointer
+byte Sprite_Data           ; // 0x0200
+ 
+byte Sprite_Y_Position     ; // 0x0200
+byte Sprite_Tilenumber     ; // 0x0201
+byte Sprite_Attributes     ; // 0x0202
+byte Sprite_X_Position     ; // 0x0203
+ 
+byte ScreenEdge_PageLoc    ; // 0x071a
+byte ScreenEdge_X_Pos      ; // 0x071c
+byte ScreenLeft_PageLoc    ; // 0x071a
+byte ScreenRight_PageLoc   ; // 0x071b
+byte ScreenLeft_X_Pos      ; // 0x071c
+byte ScreenRight_X_Pos     ; // 0x071d
+ 
+byte PlayerFacingDir       ; // 0x33
+byte DestinationPageLoc    ; // 0x34
+byte VictoryWalkControl    ; // 0x35
+byte ScrollFractional      ; // 0x0768
+byte PrimaryMsgCounter     ; // 0x0719
+byte SecondaryMsgCounter   ; // 0x0749
+
+byte HorizontalScroll      ; // 0x073f
+byte VerticalScroll        ; // 0x0740
+byte ScrollLock            ; // 0x0723
+byte ScrollThirtyTwo       ; // 0x073d
+byte Player_X_Scroll       ; // 0x06ff
+byte Player_Pos_ForScroll  ; // 0x0755
+byte ScrollAmount          ; // 0x0775
+
+byte AreaData              ; // 0xe7
+byte AreaDataLow           ; // 0xe7
+byte AreaDataHigh          ; // 0xe8
+byte EnemyData             ; // 0xe9
+byte EnemyDataLow          ; // 0xe9
+byte EnemyDataHigh         ; // 0xea
+
+byte AreaParserTaskNum     ; // 0x071f
+byte ColumnSets            ; // 0x071e
+byte CurrentPageLoc        ; // 0x0725
+byte CurrentColumnPos      ; // 0x0726
+byte BackloadingFlag       ; // 0x0728
+byte BehindAreaParserFlag  ; // 0x0729
+byte AreaObjectPageLoc     ; // 0x072a
+byte AreaObjectPageSel     ; // 0x072b
+byte AreaDataOffset        ; // 0x072c
+byte AreaObjOffsetBuffer   ; // 0x072d
+byte AreaObjectLength      ; // 0x0730
+byte StaircaseControl      ; // 0x0734
+byte AreaObjectHeight      ; // 0x0735
+byte MushroomLedgeHalfLen  ; // 0x0736
+byte EnemyDataOffset       ; // 0x0739
+byte EnemyObjectPageLoc    ; // 0x073a
+byte EnemyObjectPageSel    ; // 0x073b
+byte MetatileBuffer        ; // 0x06a1
+byte BlockBufferColumnPos  ; // 0x06a0
+byte CurrentNTAddr_Low     ; // 0x0721
+byte CurrentNTAddr_High    ; // 0x0720
+byte AttributeBuffer       ; // 0x03f9
+
+byte LoopCommand           ; // 0x0745
+ 
+byte DisplayDigits         ; // 0x07d7
+byte TopScoreDisplay       ; // 0x07d7
+byte ScoreAndCoinDisplay   ; // 0x07dd
+byte PlayerScoreDisplay    ; // 0x07dd
+byte GameTimerDisplay      ; // 0x07f8
+byte DigitModifier         ; // 0x0134
+ 
+byte VerticalFlipFlag      ; // 0x0109
+byte FloateyNum_Control    ; // 0x0110
+byte ShellChainCounter     ; // 0x0125
+byte FloateyNum_Timer      ; // 0x012c
+byte FloateyNum_X_Pos      ; // 0x0117
+byte FloateyNum_Y_Pos      ; // 0x011e
+byte FlagpoleFNum_Y_Pos    ; // 0x010d
+byte FlagpoleFNum_YMFDummy ; // 0x010e
+byte FlagpoleScore         ; // 0x010f
+byte FlagpoleCollisionYPos ; // 0x070f
+byte StompChainCounter     ; // 0x0484
+ 
+byte VRAM_Buffer1_Offset   ; // 0x0300
+byte VRAM_Buffer1          ; // 0x0301
+byte VRAM_Buffer2_Offset   ; // 0x0340
+byte VRAM_Buffer2          ; // 0x0341
+byte VRAM_Buffer_AddrCtrl  ; // 0x0773
+byte Sprite0HitDetectFlag  ; // 0x0722
+byte DisableScreenFlag     ; // 0x0774
+byte DisableIntermediate   ; // 0x0769
+byte ColorRotateOffset     ; // 0x06d4
+ 
+byte TerrainControl        ; // 0x0727
+byte AreaStyle             ; // 0x0733
+byte ForegroundScenery     ; // 0x0741
+byte BackgroundScenery     ; // 0x0742
+byte CloudTypeOverride     ; // 0x0743
+byte BackgroundColorCtrl   ; // 0x0744
+byte AreaType              ; // 0x074e
+byte AreaAddrsLOffset      ; // 0x074f
+byte AreaPointer           ; // 0x0750
+ 
+byte PlayerEntranceCtrl    ; // 0x0710
+byte GameTimerSetting      ; // 0x0715
+byte AltEntranceControl    ; // 0x0752
+byte EntrancePage          ; // 0x0751
+byte NumberOfPlayers       ; // 0x077a
+byte WarpZoneControl       ; // 0x06d6
+byte ChangeAreaTimer       ; // 0x06de
+ 
+byte MultiLoopCorrectCntr  ; // 0x06d9
+byte MultiLoopPassCntr     ; // 0x06da
+ 
+byte FetchNewGameTimerFlag ; // 0x0757
+byte GameTimerExpiredFlag  ; // 0x0759
+ 
+byte PrimaryHardMode       ; // 0x076a
+byte SecondaryHardMode     ; // 0x06cc
+byte WorldSelectNumber     ; // 0x076b
+byte WorldSelectEnableFlag ; // 0x07fc
+byte ContinueWorld         ; // 0x07fd
+ 
+byte CurrentPlayer         ; // 0x0753
+byte PlayerSize            ; // 0x0754
+byte PlayerStatus          ; // 0x0756
+ 
+byte OnscreenPlayerInfo    ; // 0x075a
+byte NumberofLives         ; // 0x075a ;used by current player
+byte HalfwayPage           ; // 0x075b
+byte LevelNumber           ; // 0x075c ;the actual dash number
+byte Hidden1UpFlag         ; // 0x075d
+byte CoinTally             ; // 0x075e
+byte WorldNumber           ; // 0x075f
+byte AreaNumber            ; // 0x0760 ;internal number used to find areas
+ 
+byte CoinTallyFor1Ups      ; // 0x0748
+ 
+byte OffscreenPlayerInfo   ; // 0x0761
+byte OffScr_NumberofLives  ; // 0x0761 ;used by offscreen player
+byte OffScr_HalfwayPage    ; // 0x0762
+byte OffScr_LevelNumber    ; // 0x0763
+byte OffScr_Hidden1UpFlag  ; // 0x0764
+byte OffScr_CoinTally      ; // 0x0765
+byte OffScr_WorldNumber    ; // 0x0766
+byte OffScr_AreaNumber     ; // 0x0767
+ 
+byte BalPlatformAlignment  ; // 0x03a0
+byte Platform_X_Scroll     ; // 0x03a1
+byte PlatformCollisionFlag ; // 0x03a2
+byte YPlatformTopYPos      ; // 0x0401
+byte YPlatformCenterYPos   ; // 0x58
+ 
+byte BrickCoinTimerFlag    ; // 0x06bc
+byte StarFlagTaskControl   ; // 0x0746
+ 
+byte PseudoRandomBitReg    ; // 0x07a7
+byte WarmBootValidation    ; // 0x07ff
+ 
+byte SprShuffleAmtOffset   ; // 0x06e0
+byte SprShuffleAmt         ; // 0x06e1
+byte SprDataOffset         ; // 0x06e4
+byte Player_SprDataOffset  ; // 0x06e4
+byte Enemy_SprDataOffset   ; // 0x06e5
+byte Block_SprDataOffset   ; // 0x06ec
+byte Alt_SprDataOffset     ; // 0x06ec
+byte Bubble_SprDataOffset  ; // 0x06ee
+byte FBall_SprDataOffset   ; // 0x06f1
+byte Misc_SprDataOffset    ; // 0x06f3
+byte SprDataOffset_Ctrl    ; // 0x03ee
+ 
+byte Player_State          ; // 0x1d
+byte Enemy_State           ; // 0x1e
+byte Fireball_State        ; // 0x24
+byte Block_State           ; // 0x26
+byte Misc_State            ; // 0x2a
+ 
+byte Player_MovingDir      ; // 0x45
+byte Enemy_MovingDir       ; // 0x46
+ 
+byte SprObject_X_Speed     ; // 0x57
+byte Player_X_Speed        ; // 0x57
+byte Enemy_X_Speed         ; // 0x58
+byte Fireball_X_Speed      ; // 0x5e
+byte Block_X_Speed         ; // 0x60
+byte Misc_X_Speed          ; // 0x64
+ 
+byte Jumpspring_FixedYPos  ; // 0x58
+byte JumpspringAnimCtrl    ; // 0x070e
+byte JumpspringForce       ; // 0x06db
+ 
+byte SprObject_PageLoc     ; // 0x6d
+byte Player_PageLoc        ; // 0x6d
+byte Enemy_PageLoc         ; // 0x6e
+byte Fireball_PageLoc      ; // 0x74
+byte Block_PageLoc         ; // 0x76
+byte Misc_PageLoc          ; // 0x7a
+byte Bubble_PageLoc        ; // 0x83
+
+
+byte SprObject_X_Position  ; // 0x86
+byte Player_X_Position     ; // 0x86
+byte Enemy_X_Position      ; // 0x87
+byte Fireball_X_Position   ; // 0x8d
+byte Block_X_Position      ; // 0x8f
+byte Misc_X_Position       ; // 0x93
+byte Bubble_X_Position     ; // 0x9c
+ 
+byte SprObject_Y_Speed     ; // 0x9f
+byte Player_Y_Speed        ; // 0x9f
+byte Enemy_Y_Speed         ; // 0xa0
+byte Fireball_Y_Speed      ; // 0xa6
+byte Block_Y_Speed         ; // 0xa8
+byte Misc_Y_Speed          ; // 0xac
+ 
+byte SprObject_Y_HighPos   ; // 0xb5
+byte Player_Y_HighPos      ; // 0xb5
+byte Enemy_Y_HighPos       ; // 0xb6
+byte Fireball_Y_HighPos    ; // 0xbc
+byte Block_Y_HighPos       ; // 0xbe
+byte Misc_Y_HighPos        ; // 0xc2
+byte Bubble_Y_HighPos      ; // 0xcb
+ 
+byte SprObject_Y_Position  ; // 0xce
+byte Player_Y_Position     ; // 0xce
+byte Enemy_Y_Position      ; // 0xcf
+byte Fireball_Y_Position   ; // 0xd5
+byte Block_Y_Position      ; // 0xd7
+byte Misc_Y_Position       ; // 0xdb
+byte Bubble_Y_Position     ; // 0xe4
+ 
+byte SprObject_Rel_XPos    ; // 0x03ad
+byte Player_Rel_XPos       ; // 0x03ad
+byte Enemy_Rel_XPos        ; // 0x03ae
+byte Fireball_Rel_XPos     ; // 0x03af
+byte Bubble_Rel_XPos       ; // 0x03b0
+byte Block_Rel_XPos        ; // 0x03b1
+byte Misc_Rel_XPos         ; // 0x03b3
+ 
+byte SprObject_Rel_YPos    ; // 0x03b8
+byte Player_Rel_YPos       ; // 0x03b8
+byte Enemy_Rel_YPos        ; // 0x03b9
+byte Fireball_Rel_YPos     ; // 0x03ba
+byte Bubble_Rel_YPos       ; // 0x03bb
+byte Block_Rel_YPos        ; // 0x03bc
+byte Misc_Rel_YPos         ; // 0x03be
+
+byte SprObject_SprAttrib   ; // 0x03c4
+byte Player_SprAttrib      ; // 0x03c4
+byte Enemy_SprAttrib       ; // 0x03c5
+ 
+byte SprObject_X_MoveForce ; // 0x0400
+byte Enemy_X_MoveForce     ; // 0x0401
+ 
+byte SprObject_YMF_Dummy   ; // 0x0416
+byte Player_YMF_Dummy      ; // 0x0416
+byte Enemy_YMF_Dummy       ; // 0x0417
+byte Bubble_YMF_Dummy      ; // 0x042c
+ 
+byte SprObject_Y_MoveForce ; // 0x0433
+byte Player_Y_MoveForce    ; // 0x0433
+byte Enemy_Y_MoveForce     ; // 0x0434
+byte Block_Y_MoveForce     ; // 0x043c
+ 
+byte DisableCollisionDet   ; // 0x0716
+byte Player_CollisionBits  ; // 0x0490
+byte Enemy_CollisionBits   ; // 0x0491
+ 
+byte SprObj_BoundBoxCtrl   ; // 0x0499
+byte Player_BoundBoxCtrl   ; // 0x0499
+byte Enemy_BoundBoxCtrl    ; // 0x049a
+byte Fireball_BoundBoxCtrl ; // 0x04a0
+byte Misc_BoundBoxCtrl     ; // 0x04a2
+ 
+byte EnemyFrenzyBuffer     ; // 0x06cb
+byte EnemyFrenzyQueue      ; // 0x06cd
+byte Enemy_Flag            ; // 0x0f
+byte Enemy_ID              ; // 0x16
+ 
+byte PlayerGfxOffset       ; // 0x06d5
+byte Player_XSpeedAbsolute ; // 0x0700
+byte FrictionAdderHigh     ; // 0x0701
+byte FrictionAdderLow      ; // 0x0702
+byte RunningSpeed          ; // 0x0703
+byte SwimmingFlag          ; // 0x0704
+byte Player_X_MoveForce    ; // 0x0705
+byte DiffToHaltJump        ; // 0x0706
+byte JumpOrigin_Y_HighPos  ; // 0x0707
+byte JumpOrigin_Y_Position ; // 0x0708
+byte VerticalForce         ; // 0x0709
+byte VerticalForceDown     ; // 0x070a
+byte PlayerChangeSizeFlag  ; // 0x070b
+byte PlayerAnimTimerSet    ; // 0x070c
+byte PlayerAnimCtrl        ; // 0x070d
+byte DeathMusicLoaded      ; // 0x0712
+byte FlagpoleSoundQueue    ; // 0x0713
+byte CrouchingFlag         ; // 0x0714
+byte MaximumLeftSpeed      ; // 0x0450
+byte MaximumRightSpeed     ; // 0x0456
+ 
+byte SprObject_OffscrBits  ; // 0x03d0
+byte Player_OffscreenBits  ; // 0x03d0
+byte Enemy_OffscreenBits   ; // 0x03d1
+byte FBall_OffscreenBits   ; // 0x03d2
+byte Bubble_OffscreenBits  ; // 0x03d3
+byte Block_OffscreenBits   ; // 0x03d4
+byte Misc_OffscreenBits    ; // 0x03d6
+byte EnemyOffscrBitsMasked ; // 0x03d8
+ 
+byte Cannon_Offset         ; // 0x046a
+byte Cannon_PageLoc        ; // 0x046b
+byte Cannon_X_Position     ; // 0x0471
+byte Cannon_Y_Position     ; // 0x0477
+byte Cannon_Timer          ; // 0x047d
+ 
+byte Whirlpool_Offset      ; // 0x046a
+byte Whirlpool_PageLoc     ; // 0x046b
+byte Whirlpool_LeftExtent  ; // 0x0471
+byte Whirlpool_Length      ; // 0x0477
+byte Whirlpool_Flag        ; // 0x047d
+ 
+byte VineFlagOffset        ; // 0x0398
+byte VineHeight            ; // 0x0399
+byte VineObjOffset         ; // 0x039a
+byte VineStart_Y_Position  ; // 0x039d
+ 
+byte Block_Orig_YPos       ; // 0x03e4
+byte Block_BBuf_Low        ; // 0x03e6
+byte Block_Metatile        ; // 0x03e8
+byte Block_PageLoc2        ; // 0x03ea
+byte Block_RepFlag         ; // 0x03ec
+byte Block_ResidualCounter ; // 0x03f0
+byte Block_Orig_XPos       ; // 0x03f1
+ 
+byte BoundingBox_UL_XPos   ; // 0x04ac
+byte BoundingBox_UL_YPos   ; // 0x04ad
+byte BoundingBox_DR_XPos   ; // 0x04ae
+byte BoundingBox_DR_YPos   ; // 0x04af
+byte BoundingBox_UL_Corner ; // 0x04ac
+byte BoundingBox_LR_Corner ; // 0x04ae
+byte EnemyBoundingBoxCoord ; // 0x04b0
+ 
+byte PowerUpType           ; // 0x39
+ 
+byte FireballBouncingFlag  ; // 0x3a
+byte FireballCounter       ; // 0x06ce
+byte FireballThrowingTimer ; // 0x0711
+ 
+byte HammerEnemyOffset     ; // 0x06ae
+byte JumpCoinMiscOffset    ; // 0x06b7
+ 
+byte Block_Buffer_1        ; // 0x0500
+byte Block_Buffer_2        ; // 0x05d0
+ 
+byte HammerThrowingTimer   ; // 0x03a2
+byte HammerBroJumpTimer    ; // 0x3c
+byte Misc_Collision_Flag   ; // 0x06be
+ 
+byte RedPTroopaOrigXPos    ; // 0x0401
+byte RedPTroopaCenterYPos  ; // 0x58
+ 
+byte XMovePrimaryCounter   ; // 0xa0
+byte XMoveSecondaryCounter ; // 0x58
+ 
+byte CheepCheepMoveMFlag   ; // 0x58
+byte CheepCheepOrigYPos    ; // 0x0434
+byte BitMFilter            ; // 0x06dd
+ 
+byte LakituReappearTimer   ; // 0x06d1
+byte LakituMoveSpeed       ; // 0x58
+byte LakituMoveDirection   ; // 0xa0
+ 
+byte FirebarSpinState_Low  ; // 0x58
+byte FirebarSpinState_High ; // 0xa0
+byte FirebarSpinSpeed      ; // 0x0388
+byte FirebarSpinDirection  ; // 0x34
+ 
+byte DuplicateObj_Offset   ; // 0x06cf
+byte NumberofGroupEnemies  ; // 0x06d3
+ 
+byte BlooperMoveCounter    ; // 0xa0
+byte BlooperMoveSpeed      ; // 0x58
+ 
+byte BowserBodyControls    ; // 0x0363
+byte BowserFeetCounter     ; // 0x0364
+byte BowserMovementSpeed   ; // 0x0365
+byte BowserOrigXPos        ; // 0x0366
+byte BowserFlameTimerCtrl  ; // 0x0367
+byte BowserFront_Offset    ; // 0x0368
+byte BridgeCollapseOffset  ; // 0x0369
+byte BowserGfxFlag         ; // 0x036a
+byte BowserHitPoints       ; // 0x0483
+byte MaxRangeFromOrigin    ; // 0x06dc
+ 
+byte BowserFlamePRandomOfs ; // 0x0417
+ 
+byte PiranhaPlantUpYPos    ; // 0x0417
+byte PiranhaPlantDownYPos  ; // 0x0434
+byte PiranhaPlant_Y_Speed  ; // 0x58
+byte PiranhaPlant_MoveFlag ; // 0xa0
+ 
+byte FireworksCounter      ; // 0x06d7
+byte ExplosionGfxCounter   ; // 0x58
+byte ExplosionTimerCounter ; // 0xa0
+
+// Sound related defines
+byte Squ2_NoteLenBuffer    ; // 0x07b3
+byte Squ2_NoteLenCounter   ; // 0x07b4
+byte Squ2_EnvelopeDataCtrl ; // 0x07b5
+byte Squ1_NoteLenCounter   ; // 0x07b6
+byte Squ1_EnvelopeDataCtrl ; // 0x07b7
+byte Tri_NoteLenBuffer     ; // 0x07b8
+byte Tri_NoteLenCounter    ; // 0x07b9
+byte Noise_BeatLenCounter  ; // 0x07ba
+byte Squ1_SfxLenCounter    ; // 0x07bb
+byte Squ2_SfxLenCounter    ; // 0x07bd
+byte Sfx_SecondaryCounter  ; // 0x07be
+byte Noise_SfxLenCounter   ; // 0x07bf
+
+byte PauseSoundQueue       ; // 0xfa
+byte Square1SoundQueue     ; // 0xff
+byte Square2SoundQueue     ; // 0xfe
+byte NoiseSoundQueue       ; // 0xfd
+byte AreaMusicQueue        ; // 0xfb
+byte EventMusicQueue       ; // 0xfc
+
+byte Square1SoundBuffer    ; // 0xf1
+byte Square2SoundBuffer    ; // 0xf2
+byte NoiseSoundBuffer      ; // 0xf3
+byte AreaMusicBuffer       ; // 0xf4
+byte EventMusicBuffer      ; // 0x07b1
+byte PauseSoundBuffer      ; // 0x07b2
+
+byte MusicData             ; // 0xf5
+byte MusicDataLow          ; // 0xf5
+byte MusicDataHigh         ; // 0xf6
+byte MusicOffset_Square2   ; // 0xf7
+byte MusicOffset_Square1   ; // 0xf8
+byte MusicOffset_Triangle  ; // 0xf9
+byte MusicOffset_Noise     ; // 0x07b0
+ 
+byte NoteLenLookupTblOfs   ; // 0xf0
+byte DAC_Counter           ; // 0x07c0
+byte NoiseDataLoopbackOfs  ; // 0x07c1
+byte NoteLengthTblAdder    ; // 0x07c4
+byte AreaMusicBuffer_Alt   ; // 0x07c5
+byte PauseModeFlag         ; // 0x07c6
+byte GroundMusicHeaderOfs  ; // 0x07c7
+byte AltRegContentFlag     ; // 0x07ca
 
 //-------------------------------------------------------------------------------------
 // CONSTANTS

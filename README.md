@@ -29,7 +29,7 @@ However, I will make an effort to make the code malleable, as I'd like to make a
 
 While this is a great 1:1 port of the game, it was made via automated methods, and mostly ends up reimplementating CPU Registers and similar. The goal of this transpilation is to reimagine the Code as a fully native C Program, and having the game run natively on the end-users hardware. 
 
-### What about the C++ by Łykasz Jakowski?
+### What about the C++ Port by Łykasz Jakowski?
 [uMario_Jakowski](https://github.com/jakowskidev/uMario_Jakowski)
 
 This is a Remake of the game, not using it's original source-code as a guideline.
