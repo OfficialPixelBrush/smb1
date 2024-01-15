@@ -56,27 +56,25 @@ byte ObjectOffset = 0x08;
 
 byte FrameCounter = 0x09;
 
-/*
-byte SavedJoypadBits= 0x06fc
-SavedJoypad1Bits      = 0x06fc
-SavedJoypad2Bits      = 0x06fd
-JoypadBitMask         = 0x074a
-JoypadOverride        = 0x0758
-
-A_B_Buttons           = 0x0a
-PreviousA_B_Buttons   = 0x0d
-Up_Down_Buttons       = 0x0b
-Left_Right_Buttons    = 0x0c
-
-GameEngineSubroutine  = 0x0e
-
-Mirror_PPU_CTRL_REG1  = 0x0778
-Mirror_PPU_CTRL_REG2  = 0x0779
-
-OperMode              = 0x0770
-OperMode_Task         = 0x0772
-ScreenRoutineTask     = 0x073c
-*/
+byte SavedJoypadBits       ; // 0x06fc
+byte SavedJoypad1Bits      ; // 0x06fc
+byte SavedJoypad2Bits      ; // 0x06fd
+byte JoypadBitMask         ; // 0x074a
+byte JoypadOverride        ; // 0x0758
+ 
+byte A_B_Buttons           ; // 0x0a
+byte PreviousA_B_Buttons   ; // 0x0d
+byte Up_Down_Buttons       ; // 0x0b
+byte Left_Right_Buttons    ; // 0x0c
+ 
+byte GameEngineSubroutine  ; // 0x0e
+ 
+byte Mirror_PPU_CTRL_REG1  ; // 0x0778
+byte Mirror_PPU_CTRL_REG2  ; // 0x0779
+ 
+byte OperMode              ; // 0x0770
+byte OperMode_Task         ; // 0x0772
+byte ScreenRoutineTask     ; // 0x073c
 
 byte GamePauseStatus       ; // 0x0776
 byte GamePauseTimer        ; // 0x0777
@@ -174,7 +172,8 @@ byte AttributeBuffer       ; // 0x03f9
 byte LoopCommand           ; // 0x0745
  
 byte DisplayDigits         ; // 0x07d7
-byte TopScoreDisplay       ; // 0x07d7
+#define TopScoreDisplayLength 6
+byte TopScoreDisplay[TopScoreDisplayLength]; // 0x07d7
 byte ScoreAndCoinDisplay   ; // 0x07dd
 byte PlayerScoreDisplay    ; // 0x07dd
 byte GameTimerDisplay      ; // 0x07f8
@@ -676,10 +675,126 @@ byte AltRegContentFlag     ; // 0x07ca
 #define VictoryModeValue 2
 #define GameOverModeValue 3
 
+// Hacks/Temps
+byte nonMaskableInterrupt = 0;
 
+struct Sprite {
+	unsigned int x;
+	unsigned int y;
+};
+typedef struct Sprite Sprite;
 
+#define numberOfSprites 8
+Sprite spriteArray[numberOfSprites];
+byte nameTable[1024];
+byte attributeTable[1024];
+
+int InitalizeMemory() {
+    // TODO
+    return 0;
+}
+
+// this routine moves all sprites off the screen
+int MoveAllSpritesOffscreen() {
+    // this routine moves all but sprite 0 off the screen
+    for (int currentSprite = 1; currentSprite < numberOfSprites; currentSprite++) {
+        spriteArray[currentSprite].y = 0xf8;
+    }
+    return 0;
+}
+
+int WritePPUReg1(byte input) {
+    PPU_CTRL_REG1 = input;
+    Mirror_PPU_CTRL_REG1 = input;
+    return 0;
+}
+
+int InitScroll(byte input) {
+    PPU_SCROLL_REG = input;
+}
+
+int WriteNTAddr(byte input) {
+    for (int currentNT = 0; currentNT < 768; currentNT++) {
+        nameTable[currentNT] = 0x24;
+    }
+    VRAM_Buffer1_Offset = 0;
+    VRAM_Buffer1 = 0;
+    for (int currentAT = 0; currentAT < 0x64; currentAT++) {
+        attributeTable[currentAT] = 0;
+    }
+    HorizontalScroll = 0;
+    VerticalScroll = 0;
+    InitScroll();
+    return 0;
+}
+
+int InitializeNameTables() {
+    byte temp = PPU_STATUS;
+    temp = Mirror_PPU_CTRL_REG1;
+    temp |= 0b00010000;
+    temp &= 0b11110000;
+    WritePPUReg1(temp);
+    WriteNTAddr(0x24);
+    WriteNTAddr(0x20);
+    return 0;
+}
+
+int Start() {
+    // Init PPU Control Register
+    PPU_CTRL_REG1 = 0b00010000;
+    // Wait two frames
+    //while (!PPU_STATUS) {}
+    //while (!PPU_STATUS) {}
+    // Warm boot check
+    for (int digit = 0; digit < TopScoreDisplayLength; digit++) {
+        if (TopScoreDisplay[digit] > 10) {
+            // Cold boot
+        }
+    }
+    // second checkpoint, check if this location has a specific value
+    if (WarmBootValidation != 0xa5) {
+        // Cold boot
+    }
+
+    // Clear memory
+    InitalizeMemory();
+
+    // SND_DELTA_REG
+    OperMode = 0;
+    // Set warm boot flag
+    WarmBootValidation = 0xa5;
+    // Set seed for pseudorandom register
+    PseudoRandomBitReg = 0xa5;
+    // Enable sound except DMC
+    SND_MASTERCTRL_REG = 0b00001111;
+    // turn off clipping for OAM and background
+    PPU_CTRL_REG2 = 0b00000110;
+    // initialize both name tables
+    MoveAllSpritesOffscreen();
+    InitializeNameTables();
+    // set flag to disable screen output
+    DisableScreenFlag++;
+    // Enable NMIs
+    WritePPUReg1(Mirror_PPU_CTRL_REG1 | 0b10000000);
+    // endless loop, need I say more?
+    while(!nonMaskableInterrupt); // Maybe waiting for an interrupt, since NMIs got enabled?
+    // Yes! I was correct!! It waits for an NMI interrupt!!
+    // The NMI is the VBlank signal from the PPU!!
+    // So the above Loop will need to be stopped via the PPU thread
+    NonMaskableInterrupt();
+}
+
+/*
+THREADS
+Main/CPU Thread
+PPU Thread
+APU Thread(?)
+Controller thread
+
+*/
 
 int main() {
-    printf("Hello, World!\n");
+    printf("Hello, Mario!\n");
+    Start();
     return 0;
 }
