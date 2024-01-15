@@ -725,7 +725,7 @@ int WriteNTAddr(byte input) {
     }
     HorizontalScroll = 0;
     VerticalScroll = 0;
-    InitScroll();
+    InitScroll(0);
     return 0;
 }
 
@@ -741,6 +741,8 @@ int InitializeNameTables() {
 }
 
 int NonMaskableInterrupt() {
+    // Disable interrupts
+    
     return 0;
 }
 
