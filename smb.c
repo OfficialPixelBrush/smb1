@@ -677,6 +677,7 @@ byte AltRegContentFlag     ; // 0x07ca
 
 // Hacks/Temps
 byte nonMaskableInterrupt = 0;
+byte running = 1;
 
 struct Sprite {
 	unsigned int x;
@@ -739,24 +740,35 @@ int InitializeNameTables() {
     return 0;
 }
 
+int NonMaskableInterrupt() {
+    return 0;
+}
+
 int Start() {
     // Init PPU Control Register
-    PPU_CTRL_REG1 = 0b00010000;
+    // Set PPU Background Address to 0x1000
+    //PPU_CTRL_REG1 = 0b00010000;
     // Wait two frames
     //while (!PPU_STATUS) {}
     //while (!PPU_STATUS) {}
+    // Note: Might not need cold/warm boot check, since all it does is specify which address' will need to be changed.
+    // That's what the cold/warm offsets are for
     // Warm boot check
     for (int digit = 0; digit < TopScoreDisplayLength; digit++) {
         if (TopScoreDisplay[digit] > 10) {
+            goto ColdBoot;
             // Cold boot
         }
     }
     // second checkpoint, check if this location has a specific value
     if (WarmBootValidation != 0xa5) {
         // Cold boot
+        goto ColdBoot;
     }
 
+    ColdBoot:
     // Clear memory
+    // TODO: Tell memory from where until where to clear
     InitalizeMemory();
 
     // SND_DELTA_REG
@@ -777,11 +789,16 @@ int Start() {
     // Enable NMIs
     WritePPUReg1(Mirror_PPU_CTRL_REG1 | 0b10000000);
     // endless loop, need I say more?
-    while(!nonMaskableInterrupt); // Maybe waiting for an interrupt, since NMIs got enabled?
-    // Yes! I was correct!! It waits for an NMI interrupt!!
-    // The NMI is the VBlank signal from the PPU!!
-    // So the above Loop will need to be stopped via the PPU thread
-    NonMaskableInterrupt();
+    while(running) {
+        //while(!nonMaskableInterrupt); // Maybe waiting for an interrupt, since NMIs got enabled?
+        // Yes! I was correct!! It waits for an NMI interrupt!!
+        // The NMI is the VBlank signal from the PPU!!
+        // So the above Loop will need to be stopped via the PPU thread
+        if (nonMaskableInterrupt) {
+            NonMaskableInterrupt();
+        }
+        // Did I just solve the NMI loop situation lmfao?
+    }
 }
 
 /*
