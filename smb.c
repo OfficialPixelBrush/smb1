@@ -11,9 +11,11 @@
 #if __STDC_VERSION__ >= 199901L
     // If we're using C99+, we can just use uint8
     typedef uint8_t byte;
+    typedef uint16_t word;
 #else
     // Otherwise we need to use unsigned chars
     typedef unsigned char byte;
+    typedef unsigned short word;
 #endif
 
 //-------------------------------------------------------------------------------------
