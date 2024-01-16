@@ -5,6 +5,7 @@
 // Libaries
 #include <stdio.h>
 #include <stdint.h>
+// #include <threads.h>
 
 // Type definitions
 #if __STDC_VERSION__ >= 199901L
@@ -28,14 +29,117 @@
 // TODO: These'll need to be semi-emulated?
 // These'll at least be used to get info from the rendering engine
 
-byte PPU_CTRL_REG1         ;// 0x2000
-byte PPU_CTRL_REG2         ;// 0x2001
-byte PPU_STATUS            ;// 0x2002
-byte PPU_SPR_ADDR          ;// 0x2003
-byte PPU_SPR_DATA          ;// 0x2004
-byte PPU_SCROLL_REG        ;// 0x2005
-byte PPU_ADDRESS           ;// 0x2006
-byte PPU_DATA              ;// 0x2007
+/*
+    For any info on what the Registers below Expect,
+    visit https://www.nesdev.org/wiki/PPU_registers
+*/
+
+struct PPU {
+    /*
+        Internal: PPU write latch
+        ----- ----
+        
+        0/w: Toggles on each write to either PPUSCROLL or PPUADDR, indicating whether this is the first or second write. Clears on reads of PPUSTATUS. Sometimes called the 'write latch' or 'write toggle'.
+    */
+    byte PPU_FLAGS; 
+
+    /*
+        0x2000: PPU control register
+        ----- ----
+
+        7: Generate an NMI at the start of the vertical blanking interval (0: off; 1: on)
+
+        6: PPU master/slave select (0: read backdrop from EXT pins; 1: output color on EXT pins)
+
+        5: Sprite size (0: 8x8 pixels; 1: 8x16 pixels – see PPU OAM#Byte 1)
+
+        4: Background pattern table address (0: $0000; 1: $1000)
+
+        3: Sprite pattern table address for 8x8 sprites (0: $0000; 1: $1000; ignored in 8x16 mode)
+
+        2: VRAM address increment per CPU read/write of PPUDATA (0: add 1, going across; 1: add 32, going down)
+
+        1-0: Base nametable address (0 = $2000; 1 = $2400; 2 = $2800; 3 = $2C00)
+    */
+    byte PPU_CTRL_REG1         ;
+
+    /*
+        0x2001: PPU mask register
+        ----- ----
+        
+        7: Emphasize blue
+
+        6: Emphasize green (red on PAL/Dendy)
+
+        5: Emphasize red (green on PAL/Dendy)
+
+        4: 1: Show sprites
+
+        3: 1: Show background
+
+        2: 1: Show sprites in leftmost 8 pixels of screen, 0: Hide
+
+        1: 1: Show background in leftmost 8 pixels of screen, 0: Hide
+
+        0: Greyscale (0: normal color, 1: produce a greyscale display)
+    */
+    byte PPU_CTRL_REG2         ;
+
+    /*
+        0x2002: PPU status register
+        ----- ----
+
+        7: Vertical blank has started (0: not in vblank; 1: in vblank). Set at dot 1 of line 241 (the line *after* the post-render line); cleared after reading $2002 and at dot 1 of the pre-render line.
+
+        6: Sprite 0 Hit.  Set when a nonzero pixel of sprite 0 overlaps a nonzero background pixel; cleared at dot 1 of the pre-render line.  Used for raster timing.
+
+        5: Sprite overflow. The intent was for this flag to be set whenever more than eight sprites appear on a scanline, but a hardware bug causes the actual behavior to be more complicated and generate false positives as well as false negatives; see PPU sprite evaluation. This flag is set during sprite evaluation and cleared at dot 1 (the second dot) of the pre-render line.
+
+        4-0: PPU open bus. Returns stale PPU bus contents.
+    */
+    byte PPU_STATUS            ;
+
+    // 0x2003: OAM address port 
+    byte PPU_SPR_ADDR          ;
+
+    // 0x2004: OAM data port 
+    byte PPU_SPR_DATA          ;
+
+    /*
+        0x2005: PPU scrolling position register
+        ----- ----
+        
+        On the NES this requires two writes, one for X Scroll, another for Y Scroll
+    */
+    //byte PPU_SCROLL_REG        ;
+    int PPU_SCROLL_REG_X        ;
+    int PPU_SCROLL_REG_Y        ;
+
+    
+    /*
+        0x2006: PPU address register 
+        ----- ----
+
+        Because the CPU and the PPU are on separate buses, neither has direct access to the other's memory. The CPU writes to VRAM through a pair of registers on the PPU by first loading an address into PPUADDR and then it writing data repeatedly to PPUDATA. The 16-bit address is written to PPUADDR one byte at a time, upper byte first. Whether this is the first or second write is tracked internally by the w register, which is shared with PPUSCROLL.
+    
+        After reading PPUSTATUS to clear w (the write latch), write the 16-bit address of VRAM you want to access here, upper byte first.
+    */
+    unsigned int PPU_ADDRESS           ;
+
+    /*
+        0x2007: PPU data port
+
+        ----- ----
+
+        VRAM read/write data register. After access, the video memory address will increment by an amount determined by bit 2 of $2000.
+
+        When the screen is turned off by disabling the background/sprite rendering flag with the PPUMASK or during vertical blank, you can read or write data from VRAM through this port. Since accessing this register increments the VRAM address, it should not be accessed outside vertical or forced blanking because it will cause graphical glitches, and if writing, write to an unpredictable address in VRAM. However, two games are known to read from PPUDATA during rendering: see Tricky-to-emulate games.
+
+        VRAM reading and writing shares the same internal address register that rendering uses. So after loading data into video memory, the program should reload the scroll position afterwards with PPUSCROLL and PPUCTRL (bits 1…0) writes in order to avoid wrong scrolling. 
+    */
+    byte PPU_DATA              ;
+};
+typedef struct PPU PPU;
  
 byte SND_REGISTER          ;// 0x4000
 byte SND_SQUARE1_REG       ;// 0x4000
@@ -675,7 +779,37 @@ byte AltRegContentFlag     ; // 0x07ca
 #define VictoryModeValue 2
 #define GameOverModeValue 3
 
+// PPU Functions
+byte readFromPPUStatus(PPU * _ppu) {
+    byte temp = _ppu->PPU_STATUS;
+    // Reading the status register will clear bit 7 mentioned above
+    // and also the address latch used by PPUSCROLL and PPUADDR.
+    // It does not clear the sprite 0 hit or overflow bit.
+    _ppu->PPU_STATUS &= 0b01111111;
+
+    // (w) Clears on reads of PPUSTATUS.
+    // Sometimes called the 'write latch' or 'write toggle'.
+    _ppu->PPU_FLAGS = 0;
+    return temp;
+}
+
+int writeToPPUAddress(unsigned int address, PPU * _ppu) {
+    _ppu->PPU_ADDRESS = address;
+    _ppu->PPU_FLAGS = !_ppu->PPU_FLAGS;
+    return 0;
+}
+
+int writeToPPUScroll(int scrollX, int scrollY, PPU * _ppu) {
+    _ppu->PPU_SCROLL_REG_X = scrollX;
+    _ppu->PPU_SCROLL_REG_Y = scrollY;
+    _ppu->PPU_FLAGS = !_ppu->PPU_FLAGS;
+}
+
+
+// Game Functions
 // Hacks/Temps
+PPU ppu;
+
 byte nonMaskableInterrupt = 0;
 byte running = 1;
 
@@ -705,13 +839,14 @@ int MoveAllSpritesOffscreen() {
 }
 
 int WritePPUReg1(byte input) {
-    PPU_CTRL_REG1 = input;
+    ppu.PPU_CTRL_REG1 = input;
     Mirror_PPU_CTRL_REG1 = input;
     return 0;
 }
 
 int InitScroll(byte input) {
-    PPU_SCROLL_REG = input;
+    ppu.PPU_SCROLL_REG_X = input;
+    ppu.PPU_SCROLL_REG_Y = input;
 }
 
 int WriteNTAddr(byte input) {
@@ -730,7 +865,7 @@ int WriteNTAddr(byte input) {
 }
 
 int InitializeNameTables() {
-    byte temp = PPU_STATUS;
+    byte temp = ppu.PPU_STATUS;
     temp = Mirror_PPU_CTRL_REG1;
     temp |= 0b00010000;
     temp &= 0b11110000;
@@ -741,15 +876,21 @@ int InitializeNameTables() {
 }
 
 int NonMaskableInterrupt() {
+    byte temp = ppu.PPU_CTRL_REG1;
+
     // Disable interrupts
-    
+    if (DisableScreenFlag) {
+        goto ScreenOff;
+    }
+    ScreenOff:
+
     return 0;
 }
 
 int Start() {
     // Init PPU Control Register
     // Set PPU Background Address to 0x1000
-    //PPU_CTRL_REG1 = 0b00010000;
+    //ppu.PPU_CTRL_REG1 = 0b00010000;
     // Wait two frames
     //while (!PPU_STATUS) {}
     //while (!PPU_STATUS) {}
@@ -782,7 +923,7 @@ int Start() {
     // Enable sound except DMC
     SND_MASTERCTRL_REG = 0b00001111;
     // turn off clipping for OAM and background
-    PPU_CTRL_REG2 = 0b00000110;
+    ppu.PPU_CTRL_REG2 = 0b00000110;
     // initialize both name tables
     MoveAllSpritesOffscreen();
     InitializeNameTables();
