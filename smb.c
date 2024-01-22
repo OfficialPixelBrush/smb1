@@ -8,6 +8,9 @@
 // #include <threads.h>
 
 // Type definitions
+// - Note -
+// This is unnecessary, but now I'll just
+// keep it because it pisses off an acquaintance of mine
 #if __STDC_VERSION__ >= 199901L
     // If we're using C99+, we can just use uint8
     typedef uint8_t byte;
